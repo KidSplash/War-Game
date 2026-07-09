@@ -1,8 +1,17 @@
+//Canvas Setup
+const canvas = document.getElementById('myCanvas');
+const ctx = canvas.getContext('2d');
+const imageData = ctx.createImageData(canvas.width, canvas.height);
+let Cwidth = canvas.width;
+let Cheight = canvas.height;
+
+
 //Other Variables
 let zoom = 20;
 let scrollSpeed = 1;
 let worldX = 0;
 let worldY = 0;
+let mode = 0;
 
 //Game Data
 //Teams
@@ -135,21 +144,12 @@ const array = [];
 console.log(array)*/
 
 
-//Graphics
-//Setup
-const canvas = document.getElementById('myCanvas');
-const ctx = canvas.getContext('2d');
-const imageData = ctx.createImageData(canvas.width, canvas.height);
-const pixels = imageData.data;
-const buffer32 = new Uint32Array(pixels.buffer);
-const color = 0xffffffff; // ARGB (A=255, R=0, G=0, B=0)
-
 //Drawing Functions
 const hex = function(x, y, color){
   let xMod = x * zoom * 3.5 + worldX * zoom;
   let yMod = y * zoom * 3 + worldY * zoom;
   if (y % 2 == 1) { xMod += zoom * 1.75; }
-  ctx.fillStyle = `rgba(${color[0]}, ${color[1]}, ${color[2]}, ${255})`;
+  ctx.fillStyle = `rgba(${color[0]}, ${color[1]}, ${color[2]}, ${1})`;
   ctx.beginPath();
   ctx.moveTo(xMod, yMod + zoom);
   ctx.lineTo(xMod, yMod + zoom * 3);
@@ -166,7 +166,7 @@ const unit = function(unit, type){
   if (unit[2] % 2 == 1) { xMod += zoom * 1.75; }
   let centerX = xMod + zoom * 1.75;
   let centerY = yMod + zoom * 2;
-  ctx.fillStyle = `rgba(${teamArray[unit[5]][0]}, ${teamArray[unit[5]][1]}, ${teamArray[unit[5]][2]}, ${255})`;
+  ctx.fillStyle = `rgba(${teamArray[unit[5]][0]}, ${teamArray[unit[5]][1]}, ${teamArray[unit[5]][2]}, ${1})`;
   ctx.beginPath();
   ctx.arc(centerX, centerY, zoom, 0, 2 * Math.PI);
   ctx.fill();
@@ -180,30 +180,9 @@ const unit = function(unit, type){
   ctx.lineWidth = zoom / 10;
   ctx.stroke();
 }
-/*for(var a = 0; a < names.length; a++){
-        for(var b = 0; b < names[a].num.length; b++){
-            for(var c = 0; c <= names[a].num[c]; c++){
-                var curCol = names[a].te[b];
-                fill(curCol.col[0], curCol.col[1], curCol.col[2]);
-                var x = names[a].x[b];
-                var y = names[a].y[b];
-                    
-                ellipse(x[c], y[c], zoom, zoom);
-                fill(0, 0, 0);
-                beginShape();
-                strokeWeight(2);
-                stroke(0, 0, 0);
-                for(var d = 0; d < names[a].sign.length; d++){
-                    var vert = names[a].sign[d];
-                    vertex(vert[0] * zoom / 50 + x[c], vert[1]  * zoom / 50 + y[c]);
-                }
-                endShape();
-                noStroke();
-            }
-        }
-    }
-*/
 const drawMap = function(){
+  ctx.fillStyle = "white";
+  ctx.fillRect(0, 0, Cwidth, Cheight);
   for (let a = 0; a < width; a++){
     for (let b = 0; b < height; b++){
       hex(a, b, tileTypes[mapArray[b][a]].color);
@@ -224,16 +203,37 @@ let atkClikd = false;
 let movClikd = false;
 let curUnitIndex;
 
+const clickOnUnit = function(x, y, type, unit) {
+  drawMap();
+  unitClikd = true;
+  ctx.fillStyle = `rgba(${255}, ${255}, ${255}, ${0.125})`;
+  let i = type.ran;
+  while (i > 0) {
+    ctx.beginPath();
+    ctx.arc(x, y, zoom * i * 4, 0, 2 * Math.PI);
+    ctx.fill();
+    i--;
+  }
+  if (unit[5] == curTeam) {
+    ctx.fillStyle = `rgba(${0}, ${89}, ${214}, ${1})`;
+    ctx.fillRect(Cwidth / 2, 5 * Cheight / 8, Cwidth, Cheight);
+    ctx.fillStyle = `rgba(${255}, ${255}, ${255}, ${1})`;
+    ctx.beginPath();
+    ctx.arc(3 * Cwidth / 5, 29 * Cheight / 40, Cwidth / 16, 0, 2 * Math.PI);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(3 * Cwidth / 4, 29 * Cheight / 40, Cwidth / 16, 0, 2 * Math.PI);
+    ctx.fill();
+  }
+}
 
 const click = function() {
   for(let a = 0; a < units.length; a++){
     for(let b = 0; b < units[a].length; b++){
-      const xMod = zoom * 1.75 * (units[a][b][2] % 2);
-      if(mouseX > units[a][b][1] * zoom * 3.5 + (worldX + 1.75) * zoom + xMod - zoom &&
-        mouseX < units[a][b][1] * zoom * 3.5 + (worldX + 1.75) * zoom + xMod + zoom &&
-        mouseY > units[a][b][2] * zoom * 3 + (worldY + 2) * zoom - zoom &&
-        mouseY < units[a][b][2] * zoom * 3 + (worldY + 2) * zoom + zoom){
-        console.log("oh")
+      const x = units[a][b][1] * zoom * 3.5 + (worldX + 1.75) * zoom + zoom * 1.75 * (units[a][b][2] % 2);
+      const y = units[a][b][2] * zoom * 3 + (worldY + 2) * zoom;
+      if(mouseX > x - zoom && mouseX < x + zoom && mouseY > y - zoom && mouseY < y + zoom){
+        clickOnUnit(x, y, unitList[a], units[a][b]);
       }
     }
   }
@@ -261,7 +261,7 @@ window.addEventListener('mousedown', m => {
 });
 window.addEventListener('mouseup', m => {
   mouse -= 1;
-  if (mouseX == reallyOldMouseX && mouseY == reallyOldMouseY){
+  if (mouseX > reallyOldMouseX - 10 && mouseX < reallyOldMouseX + 10 && mouseY > reallyOldMouseY - 10 && mouseY < reallyOldMouseY + 10){
     click();
   }
 });
@@ -275,8 +275,7 @@ window.addEventListener('mousemove', d => {
   if(mouse == 1){
     worldX += (mouseX - oldMouseX) * scrollSpeed * 2.5 / zoom;
     worldY += (mouseY - oldMouseY) * scrollSpeed * 2.5 / zoom;
-    ctx.fillStyle = "white";
-    ctx.fillRect(0, 0, 900, 1400);
     drawMap();
   }
+});
 });
