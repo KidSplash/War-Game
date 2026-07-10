@@ -180,6 +180,85 @@ const unit = function(unit, type){
   ctx.lineWidth = zoom / 10;
   ctx.stroke();
 }
+/*for(var a = 0; a < names.length; a++){
+        for(var b = 0; b < names[a].num.length; b++){
+            for(var c = 0; c <= names[a].num[c]; c++){
+                var curCol = names[a].te[b];
+                fill(curCol.col[0], curCol.col[1], curCol.col[2]);
+                var x = names[a].x[b];
+                var y = names[a].y[b];
+                    
+                ellipse(x[c], y[c], zoom, zoom);
+                fill(0, 0, 0);
+                beginShape();
+                strokeWeight(2);
+                stroke(0, 0, 0);
+                for(var d = 0; d < names[a].sign.length; d++){
+                    var vert = names[a].sign[d];
+                    vertex(vert[0] * zoom / 50 + x[c], vert[1]  * zoom / 50 + y[c]);
+                }
+                endShape();
+                noStroke();
+            }
+        }
+    }
+*/
+const drawMap = function(){
+  ctx.fillStyle = "white";
+  ctx.fillRect(0, 0, Cwidth, Cheight);
+  for (let a = 0; a < width; a++){
+    for (let b = 0; b < height; b++){
+      hex(a, b, tileTypes[mapArray[b][a]].color);
+    }
+  }
+  for (let a = 0; a < units.length; a++){
+    for (let b = 0; b < units[a].length; b++){
+      unit(units[a][b], a);
+    }
+  }
+}
+//drawMap();
+
+
+//Input and Game State
+let unitClikd = false;
+let atkClikd = false;
+let movClikd = false;
+let curUnitIndex;
+
+const clickOnUnit = function(x, y, type, unit) {
+  drawMap();
+  unitClikd = true;
+  ctx.fillStyle = `rgba(${255}, ${255}, ${255}, ${0.125})`;
+  let i = type.ran;
+  while (i > 0) {
+    ctx.beginPath();
+    ctx.arc(x, y, zoom * i * 4, 0, 2 * Math.PI);
+    ctx.fill();
+    i--;
+  }
+  if (unit[5] == curTeam) {
+    ctx.fillStyle = `rgba(${0}, ${89}, ${214}, ${1})`;
+    ctx.fillRect(Cwidth / 2, 5 * Cheight / 8, Cwidth, Cheight);
+    ctx.fillStyle = `rgba(${255}, ${255}, ${255}, ${1})`;
+    ctx.beginPath();
+    ctx.arc(3 * Cwidth / 5, 30 * Cheight / 40, Cwidth / 16, 0, 2 * Math.PI);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(3 * Cwidth / 4, 30 * Cheight / 40, Cwidth / 16, 0, 2 * Math.PI);
+    ctx.fill();
+    ctx.font = "30px serif";
+    ctx.fillText(type.name,  17 * Cwidth / 32, 27 * Cheight / 40);
+    ctx.font = "20px serif";
+    ctx.fillText("Actions: " + unit[3],  17 * Cwidth / 32, 37 * Cheight / 40);
+    ctx.fillText("Atk: " + type.atk,  17 * Cwidth / 32, 7 * Cheight / 8);
+    ctx.fillText("Mov: " + type.mov,  5 * Cwidth / 8, 7 * Cheight / 8);
+    ctx.fillText("Ran: " + type.ran,  23 * Cwidth / 32, 7 * Cheight / 8);
+    ctx.fillText("Cost: " + type.cost,  13 * Cwidth / 16, 7 * Cheight / 8);
+    ctx.fillStyle = `rgba(${0}, ${89}, ${214}, ${1})`;
+    
+  }
+}
 const drawMap = function(){
   ctx.fillStyle = "white";
   ctx.fillRect(0, 0, Cwidth, Cheight);
