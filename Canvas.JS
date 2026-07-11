@@ -238,6 +238,7 @@ const clickOnUnit = function(x, y, type, unit) {
     i--;
   }
   if (unit[5] == curTeam) {
+    //Unit Menu
     ctx.fillStyle = `rgba(${0}, ${89}, ${214}, ${1})`;
     ctx.fillRect(Cwidth / 2, 5 * Cheight / 8, Cwidth, Cheight);
     ctx.fillStyle = `rgba(${255}, ${255}, ${255}, ${1})`;
@@ -247,6 +248,16 @@ const clickOnUnit = function(x, y, type, unit) {
     ctx.beginPath();
     ctx.arc(3 * Cwidth / 4, 30 * Cheight / 40, Cwidth / 16, 0, 2 * Math.PI);
     ctx.fill();
+    
+    //Action Symbols
+    ctx.fillStyle = `rgba(${0}, ${89}, ${214}, ${1})`;
+    ctx.beginPath();
+    ctx.moveTo(9 * Cwidth / 16, 7 * Cheight / 10);
+    ctx.lineTo(9 * Cwidth / 16, 4 * Cheight / 5);
+    ctx.lineTo(33 * Cwidth / 50, 3 * Cheight / 4);
+    ctx.fill();
+    
+    //Stats and Name
     ctx.font = "30px serif";
     ctx.fillText(type.name,  17 * Cwidth / 32, 27 * Cheight / 40);
     ctx.font = "20px serif";
