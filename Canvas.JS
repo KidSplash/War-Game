@@ -258,6 +258,7 @@ const clickOnUnit = function(x, y, type, unit) {
     ctx.fill();
     
     //Stats and Name
+    ctx.fillStyle = `rgba(${255}, ${255}, ${255}, ${1})`;
     ctx.font = "30px serif";
     ctx.fillText(type.name,  17 * Cwidth / 32, 27 * Cheight / 40);
     ctx.font = "20px serif";
